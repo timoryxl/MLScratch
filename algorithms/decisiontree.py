@@ -48,5 +48,42 @@ def impurity(rows, metric):
     elif metric.lower() == 'entropy':
         for label in counts:
             p = counts[label]/float(len(rows))
-            value -= p**np.log2(p)
+            value -= p*np.log2(p)
     return value
+
+
+def info_gain(left, right, uncertainty, metric):
+    p = float(len(left))/(len(left) + len(right))
+    return uncertainty - p * impurity(left, metric) - (1 - p) * impurity(right, metric)
+
+
+def find_best_split(rows):
+    best_gain = None
+    best_question = None
+    # hard code
+    metric = 'gini'
+    current_uncertainty = impurity(rows, metric)
+    n_features = len(rows[0]) - 1
+
+    for col in range(n_features):
+        unique_values = set([row[col] for row in rows])
+        for val in unique_values:
+            question = Question(col, val)
+            true_rows, false_rows = partition(rows, question)
+            if len(true_rows) == 0 or len(false_rows) == 0:
+                continue
+            gain = info_gain(left=true_rows,
+                             right=false_rows,
+                             uncertainty=current_uncertainty,
+                             metric=metric)
+            if gain > best_gain:
+                best_gain, best_question = gain, question
+    return best_gain, best_question
+
+
+class Leaf:
+    def __init__(self, rows):
+        self.predictions = class_counts(rows)
+
+
+
