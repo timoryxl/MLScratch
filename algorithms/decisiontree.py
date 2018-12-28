@@ -139,3 +139,29 @@ def print_leaf(counts):
     for label in counts.keys():
         probs[label] = str(int(counts[label]/(total*100.0))) + '%'
     return probs
+
+
+if __name__ == '__main__':
+    training_data = [
+        ['Green', 3, 'Apple'],
+        ['Yellow', 3, 'Apple'],
+        ['Red', 1, 'Grape'],
+        ['Red', 1, 'Grape'],
+        ['Yellow', 3, 'Lemon'],
+    ]
+    my_tree = build_tree(training_data)
+
+    print_tree(my_tree)
+
+    # Evaluate
+    testing_data = [
+        ['Green', 3, 'Apple'],
+        ['Yellow', 4, 'Apple'],
+        ['Red', 2, 'Grape'],
+        ['Red', 1, 'Grape'],
+        ['Yellow', 3, 'Lemon'],
+    ]
+
+    for row in testing_data:
+        print ("Actual: %s. Predicted: %s" %
+               (row[-1], print_leaf(classify(row, my_tree))))
