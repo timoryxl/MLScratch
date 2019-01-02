@@ -38,3 +38,31 @@ class L1L2Regularization:
         l2_grad = (1 - self.l1_ratio) * w
         return self.alpha * (l1_grad + l2_grad)
 
+
+class Regression:
+    def __init__(self, n_iter, learning_rate):
+        self.n_iter = n_iter
+        self.learning_rate = learning_rate
+        self.w = None
+        self.training_errors = []
+
+    def initialize_weights(self, n_features):
+        # basic: initiate with zeros
+        limit = 1/np.sqrt(n_features)
+        self.w = np.random.uniform(-limit, limit, (n_features, ))
+
+    def fit(self, X, y):
+        X = np.insert(X, 0, 1, axis=1)
+        self.initialize_weights(n_features=X.shape[1])
+
+        for i in range(self.n_iter):
+            y_pred = X.dot(self.w)
+            mse = np.mean(0.5*(y_pred-y)**2 + self.regularization(self.w))
+            self.training_errors.append(mse)
+            grad_w = -(y - y_pred).dot(X)/X.shape[0] + self.regularization.grad(self.w)
+            self.w -= self.learning_rate * grad_w
+
+    def predict(self, X):
+        X = np.insert(X, 0, 1, axis=1)
+        return X.dot(self.w)
+
